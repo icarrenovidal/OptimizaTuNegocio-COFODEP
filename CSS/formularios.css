@@ -327,3 +327,22 @@
     border-radius: 8px;
     border-left: 4px solid var(--color2);
 }
+/* Mensajes tipo toast */
+.mensaje-form {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 500;
+    z-index: 9999;
+    display: inline-block;
+    transition: opacity 0.3s ease;
+}
+
+.mensaje-form.success { background-color: #28a745; }
+.mensaje-form.error   { background-color: #dc3545; }
+.mensaje-form.warning { background-color: #ffc107; color: #000; }
+
+.d-none { display: none; }

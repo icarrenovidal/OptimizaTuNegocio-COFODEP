@@ -78,7 +78,37 @@ include __DIR__ . '/../../PHP/administracion/obtener_detalle_producto.php';
 
                         <div class="mb-4">
                             <h5 class="text-muted">Descripción</h5>
-                            <p class="lead"><?= nl2br(htmlspecialchars($producto['descripcion'])) ?></p>
+                            <?php
+                            $descripcion = nl2br(htmlspecialchars($producto['descripcion']));
+                            $corta = substr($descripcion, 0, 200);
+                            ?>
+                            <p class="lead">
+                                <?= $corta ?><?= strlen($descripcion) > 200 ? '...' : '' ?>
+                            </p>
+
+                            <?php if (strlen($descripcion) > 200): ?>
+                                <button class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#descripcionModal">
+                                    Ver más
+                                </button>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- MODAL -->
+                        <div class="modal fade" id="descripcionModal" tabindex="-1" aria-labelledby="descripcionModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="descripcionModalLabel">Descripción completa</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="lead"><?= $descripcion ?></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -95,7 +125,7 @@ include __DIR__ . '/../../PHP/administracion/obtener_detalle_producto.php';
                             <div class="col-md-6 mb-3">
                                 <div class="card bg-light h-100">
                                     <div class="card-body">
-                                         <h5 class="card-title text-prueba"><i class="fas fa-ruler me-2"></i>Unidad</h5>
+                                        <h5 class="card-title text-prueba"><i class="fas fa-ruler me-2"></i>Unidad</h5>
                                         <p class="fs-4 mb-0"><?= htmlspecialchars($producto['unidad_medida']) ?></p>
                                     </div>
                                 </div>
@@ -110,14 +140,21 @@ include __DIR__ . '/../../PHP/administracion/obtener_detalle_producto.php';
         <!-- Tabla de lotes -->
         <div class="card shadow-sm mt-4">
             <div class="card-body">
-                <h4 class="mb-3"><i class="fas fa-warehouse me-2"></i>Lotes del Producto</h4>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-warehouse me-2"></i>Lotes del Producto
+                    </h4>
+                    <a href="agregar_stock.php?id=<?= $producto['id_producto'] ?>" class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus me-1"></i> Agregar Lote
+                    </a>
+
+                </div>
 
                 <?php if (count($lotes) > 0): ?>
                     <div class="table-responsive">
                         <table class="table table-striped table-hover align-middle">
                             <thead>
                                 <tr>
-                                    <th>ID Lote</th>
                                     <th>Código Lote</th>
                                     <th>Cantidad Inicial</th>
                                     <th>Cantidad Actual</th>
@@ -128,7 +165,6 @@ include __DIR__ . '/../../PHP/administracion/obtener_detalle_producto.php';
                             <tbody>
                                 <?php foreach ($lotes as $lote): ?>
                                     <tr>
-                                        <td><?= $lote['id_lote'] ?></td>
                                         <td><?= htmlspecialchars($lote['codigo_lote']) ?></td>
                                         <td><?= $lote['cantidad_inicial'] ?></td>
                                         <td><?= $lote['cantidad_actual'] ?></td>
@@ -144,6 +180,7 @@ include __DIR__ . '/../../PHP/administracion/obtener_detalle_producto.php';
                 <?php endif; ?>
             </div>
         </div>
+
     </div>
 
     <script>
@@ -157,6 +194,9 @@ include __DIR__ . '/../../PHP/administracion/obtener_detalle_producto.php';
             thumb.classList.add('border-primary');
         }
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>

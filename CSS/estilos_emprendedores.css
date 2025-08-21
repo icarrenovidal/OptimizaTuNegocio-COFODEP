@@ -1,4 +1,6 @@
-/* global.css */
+/* =========================
+   GLOBAL / VARIABLES
+========================= */
 :root {
     --color1: #8174A0;  
     --color2: #A888B5;  
@@ -11,7 +13,9 @@
     --light-gray: #e9ecef;
 }
 
-/* Estilos base */
+/* =========================
+   BASE / TIPOGRAFÍA
+========================= */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--light);
@@ -21,18 +25,6 @@ body {
     line-height: 1.6;
 }
 
-/* Contenedor principal */
-.container {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 40px;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
-    border-top: 6px solid var(--color2);
-}
-
-/* Tipografía */
 h1, h2, h3, h4, h5, h6 {
     color: var(--color1);
     margin-top: 0;
@@ -61,7 +53,22 @@ h1 {
     color: var(--color4);
 }
 
-/* Formularios */
+/* =========================
+   CONTENEDORES
+========================= */
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 40px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+    border-top: 6px solid var(--color2);
+}
+
+/* =========================
+   FORMULARIOS
+========================= */
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -113,7 +120,9 @@ textarea.form-control {
     font-weight: bold;
 }
 
-/* Botones */
+/* =========================
+   BOTONES
+========================= */
 .btn {
     display: inline-block;
     padding: 12px 24px;
@@ -148,7 +157,85 @@ textarea.form-control {
     background-color: var(--color4);
 }
 
-/* Secciones especiales */
+/* Botones personalizados integrando utilities */
+.btn-prueba {
+    background-color: var(--color2);
+    color: white;
+}
+
+.btn-prueba:hover {
+    background-color: var(--color1);
+}
+
+.btn-outline-prueba {
+    color: var(--color2);
+    border-color: var(--color2);
+    background-color: transparent;
+}
+
+.btn-outline-prueba:hover {
+    color: #fff;
+    background-color: var(--color2);
+}
+
+.btn-outline-pruebita {
+    color: var(--color3);
+    border-color: var(--color3);
+    background-color: transparent;
+}
+
+.btn-outline-pruebita:hover {
+    color: #fff;
+    background-color: var(--color3);
+}
+
+/* =========================
+   UTILITIES
+========================= */
+/* Margins y paddings */
+.mt-0 { margin-top: 0; }
+.mb-0 { margin-bottom: 0; }
+.mt-1 { margin-top: 0.5rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+/* Texto */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-primary { color: var(--color1); }
+.text-secondary { color: var(--color2); }
+.text-accent { color: var(--color3); }
+.text-warning { color: var(--color5); }
+
+/* Flexbox */
+.d-flex { display: flex; }
+.flex-column { flex-direction: column; }
+.justify-center { justify-content: center; }
+.align-center { align-items: center; }
+.gap-1 { gap: 0.5rem; }
+.gap-2 { gap: 1rem; }
+
+/* Backgrounds */
+.bg-primary { background-color: var(--color1); color: white; }
+.bg-secondary { background-color: var(--color2); color: white; }
+.bg-light { background-color: var(--light); }
+.bg-white { background-color: white; }
+
+/* Visibilidad */
+.hidden { display: none; }
+@media (max-width: 768px) {
+    .hidden-mobile { display: none; }
+}
+
+/* =========================
+   COMPONENTES ESPECIALES
+========================= */
+/* Cards */
 .card {
     background: white;
     border-radius: 10px;
@@ -157,6 +244,7 @@ textarea.form-control {
     margin-bottom: 30px;
 }
 
+/* Price / images */
 .price-section {
     background-color: rgba(4, 57, 78, 0.03);
     padding: 20px;
@@ -172,7 +260,7 @@ textarea.form-control {
     margin-top: 10px;
 }
 
-/* Componente de subida de archivos */
+/* File upload */
 .file-upload {
     text-align: center;
     cursor: pointer;
@@ -198,7 +286,7 @@ textarea.form-control {
     font-size: 1.1em;
 }
 
-/* Vista previa de imágenes */
+/* Preview imágenes */
 .preview-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -242,6 +330,16 @@ textarea.form-control {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
+/* Tabla responsive */
+.table-responsive {
+    overflow-x: auto;
+}
+
+table th, table td {
+    white-space: nowrap;
+    font-size: 0.9em;
+}
+
 /* Galería de productos */
 .product-gallery img {
     width: 100%;
@@ -265,99 +363,28 @@ textarea.form-control {
     transform: scale(1.05);
 }
 
-/* Tablas responsive */
-.table-responsive {
-    overflow-x: auto;
-}
-
-table th, table td {
-    white-space: nowrap;
-    font-size: 0.9em;
-}
-
-/* Responsive */
+/* =========================
+   MEDIA QUERIES / RESPONSIVE
+========================= */
 @media (max-width: 1200px) {
-    .container {
-        padding: 35px;
-    }
+    .container { padding: 35px; }
 }
 
 @media (max-width: 992px) {
-    .container {
-        padding: 30px;
-    }
-
-    .form-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .full-width {
-        grid-column: span 1;
-    }
-
-    .preview-container {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    }
+    .container { padding: 30px; }
+    .form-grid { grid-template-columns: 1fr; gap: 20px; }
+    .full-width { grid-column: span 1; }
+    .preview-container { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 }
 
 @media (max-width: 768px) {
-    .container {
-        padding: 25px;
-        margin: 15px;
-    }
-
-    h1 {
-        font-size: 1.8em;
-        margin-bottom: 30px;
-    }
+    .container { padding: 25px; margin: 15px; }
+    h1 { font-size: 1.8em; margin-bottom: 30px; }
+    .btn { width: 100%; padding: 14px; }
+    .hidden-mobile { display: none; }
 }
 
 @media (max-width: 576px) {
-    .container {
-        padding: 20px 15px;
-    }
-
-    .preview-container {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .btn {
-        width: 100%;
-        padding: 14px;
-    }
-}
-/* Colores de tus botones usando variables */
-.btn-prueba {
-    background-color: var(--color2) !important;
-    color: white !important;
-}
-
-.btn-prueba:hover {
-    background-color: var(--color1) !important;
-}
-
-.btn-outline-prueba {
-    color: var(--color2) !important;
-    border-color: var(--color2) !important;
-}
-
-.btn-outline-prueba:hover {
-    background-color: var(--color2) !important;
-    color: white !important;
-    border-color: var(--color2) !important;
-}
-
-.btn-outline-pruebita {
-    color: var(--color3) !important;
-    border-color: var(--color3) !important;
-}
-
-.btn-outline-pruebita:hover {
-    background-color: var(--color3) !important;
-    color: white !important;
-    border-color: var(--color3) !important;
-}
-.text-prueba {
-    color: var(--color2);
+    .container { padding: 20px 15px; }
+    .preview-container { grid-template-columns: 1fr 1fr; }
 }

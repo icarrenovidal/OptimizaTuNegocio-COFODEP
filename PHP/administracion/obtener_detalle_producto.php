@@ -11,7 +11,7 @@ if ($id <= 0) {
 $sql = "
     SELECT p.id_producto, p.nombre AS nombre_producto, p.descripcion, p.unidad_medida,
            c.nombre AS nombre_categoria,
-           COALESCE(l.cantidad_actual, 0) AS stock,
+           COALESCE(SUM(l.cantidad_actual), 0) AS stock,
            COALESCE(pr.precio_venta, 0) AS precio
     FROM productos p
     LEFT JOIN categorias_productos c ON p.id_categoria = c.id_categoria
@@ -28,7 +28,9 @@ $sql = "
         ON pp1.id_producto = pp2.id_producto AND pp1.fecha_inicio = pp2.max_fecha
     ) pr ON pr.id_producto = p.id_producto
     WHERE p.id_producto = ?
+    GROUP BY p.id_producto, p.nombre, p.descripcion, p.unidad_medida, c.nombre, pr.precio_venta
 ";
+
 
 
 $stmt = $conexion->prepare($sql);
