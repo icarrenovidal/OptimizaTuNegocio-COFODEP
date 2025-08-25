@@ -64,6 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conexion->query($sql_movimiento);
 
         // === 6. Subir imágenes ===
+
+        $uploadDir = __DIR__ . '/../../uploads/productos/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
         if (!empty($_FILES['imagenes']['name'][0])) {
             foreach ($_FILES['imagenes']['tmp_name'] as $key => $tmp_name) {
                 $fileName = basename($_FILES['imagenes']['name'][$key]);
@@ -71,11 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $newName = uniqid('prod_') . '.' . $fileExt;
                 $targetPath = $uploadDir . $newName;
 
-                // Validar tipo de archivo
                 $allowedTypes = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
                 if (in_array(strtolower($fileExt), $allowedTypes)) {
                     if (move_uploaded_file($tmp_name, $targetPath)) {
-                        // Guardar ruta en DB
                         $rutaDB = 'uploads/productos/' . $newName;
                         $sql_imagen = "INSERT INTO imagenes_productos (id_producto, ruta) VALUES ($id_producto, '$rutaDB')";
                         $conexion->query($sql_imagen);
@@ -87,7 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $response["status"] = "success";
         $response["message"] = "Producto agregado correctamente";
         $response["id_producto"] = $id_producto;
-
     } catch (Exception $e) {
         $response["status"] = "error";
         $response["message"] = $e->getMessage();

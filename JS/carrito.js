@@ -1,85 +1,222 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const cartBody = document.getElementById("cart-body");
+  const cartCount = document.getElementById("cart-count");
 
-// Función para actualizar la cantidad con los botones +/-
-function updateQuantity(button, change) {
-    const input = button.parentNode.querySelector('input');
-    let newValue = parseInt(input.value) + change;
+  // --- Cargar carrito desde la sesión ---
+  function loadCart() {
+    fetch(
+      "/OptimizaTuNegocio/OptimizaTuNegocio/Pages/administracion/carrito_actions.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "accion=list",
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        cartBody.innerHTML = "";
+        if (!data || data.length === 0) {
+          cartCount.textContent = "0 productos";
+          checkEmptyCart();
+          updateCartSummary();
+          return;
+        }
+        data.forEach((prod) => addCartRow(prod));
+        checkEmptyCart();
+        updateCartSummary();
+      })
+      .catch((err) => console.error("Error cargando carrito:", err));
+  }
 
-    if (newValue < 1) newValue = 1;
-    if (newValue > 99) newValue = 99;
+  // --- Agregar fila al carrito ---
+  function addCartRow(prod) {
+    const row = document.createElement("tr");
+    row.dataset.id = prod.id_producto;
+    row.innerHTML = `
+            <td>
+                <div class="d-flex align-items-center">
+                    <img src="${prod.imagen}" class="cart-item-img me-3" alt="${
+      prod.nombre_producto
+    }">
+                    <div>
+                        <h6 class="cart-item-title mb-1">${
+                          prod.nombre_producto
+                        }</h6>
+                        <small class="cart-item-code">Código: ${
+                          prod.id_producto
+                        }</small>
+                    </div>
+                </div>
+            </td>
+            <td class="item-price fw-bold text-prueba">${formatCurrency(
+              prod.precio
+            )}</td>
+            <td>
+                <div class="input-group quantity-control">
+                    <button class="btn quantity-btn btn-sm" type="button">-</button>
+                    <input type="number" class="form-control form-control-sm quantity-input" value="${
+                      prod.cantidad
+                    }" min="1">
+                    <button class="btn quantity-btn btn-sm" type="button">+</button>
+                </div>
+            </td>
+            <td class="item-total fw-bold text-prueba">${formatCurrency(
+              prod.precio * prod.cantidad
+            )}</td>
+            <td class="item-actions">
+                <button class="btn btn-sm btn-outline-danger" type="button">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+    cartBody.appendChild(row);
 
-    input.value = newValue;
-    updateTotal(input);
-}
+    const minusBtn = row.querySelector(".quantity-btn:first-child");
+    const plusBtn = row.querySelector(".quantity-btn:last-child");
+    const qtyInput = row.querySelector(".quantity-input");
+    const removeBtn = row.querySelector(".item-actions button");
 
-// Función para actualizar el total de un producto
-function updateTotal(input) {
-    const row = input.closest('tr');
-    const price = parseInt(row.querySelector('.item-price').textContent.replace(/\D/g, ''));
+    minusBtn.addEventListener("click", () =>
+      changeQuantity(prod.id_producto, -1, qtyInput)
+    );
+    plusBtn.addEventListener("click", () =>
+      changeQuantity(prod.id_producto, 1, qtyInput)
+    );
+    qtyInput.addEventListener("change", () =>
+      changeQuantity(prod.id_producto, 0, qtyInput, true)
+    );
+    removeBtn.addEventListener("click", () =>
+      removeItem(prod.id_producto, row)
+    );
+  }
+
+  // --- Cambiar cantidad ---
+  function changeQuantity(id, delta, input, fromInput = false) {
+    let newQty = fromInput
+      ? parseInt(input.value)
+      : parseInt(input.value) + delta;
+    if (isNaN(newQty) || newQty < 1) newQty = 1;
+    if (newQty > 99) newQty = 99;
+    input.value = newQty;
+
+    fetch(
+      "/OptimizaTuNegocio/OptimizaTuNegocio/Pages/administracion/carrito_actions.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `accion=add&id_producto=${id}&cantidad=${newQty}`,
+      }
+    )
+      .then((res) => res.json())
+      .then(() => updateRowTotal(input))
+      .catch((err) => console.error("Error actualizando cantidad:", err));
+  }
+
+  // --- Actualizar total por fila ---
+  function updateRowTotal(input) {
+    const row = input.closest("tr");
+    const price =
+      parseInt(
+        row.querySelector(".item-price").textContent.replace(/\D/g, "")
+      ) || 0;
     const qty = parseInt(input.value);
-    const totalCell = row.querySelector('.item-total');
-    totalCell.textContent = `$${(price * qty).toLocaleString()}`;
+    row.querySelector(".item-total").textContent = formatCurrency(price * qty);
     updateCartSummary();
-}
+  }
 
-// Función para eliminar un producto
-function removeItem(btn) {
-    if (confirm('¿Estás seguro de que quieres eliminar este producto de tu carrito?')) {
-        btn.closest('tr').remove();
-        updateCartSummary();
+  // --- Eliminar producto ---
+  function removeItem(id, row) {
+    if (!confirm("¿Eliminar este producto?")) return;
+    fetch(
+      "/OptimizaTuNegocio/OptimizaTuNegocio/Pages/administracion/carrito_actions.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `accion=remove&id_producto=${id}`,
+      }
+    )
+      .then((res) => res.json())
+      .then(() => {
+        row.remove();
         checkEmptyCart();
-    }
-}
-
-// Función para vaciar el carrito
-function clearCart() {
-    if (confirm('¿Estás seguro de que quieres vaciar tu carrito?')) {
-        document.querySelectorAll('#cart-body tr').forEach(row => row.remove());
         updateCartSummary();
+      })
+      .catch((err) => console.error("Error eliminando producto:", err));
+  }
+
+  // --- Vaciar carrito ---
+  window.clearCart = function () {
+    if (!confirm("¿Vaciar carrito?")) return;
+    fetch(
+      "/OptimizaTuNegocio/OptimizaTuNegocio/Pages/administracion/carrito_actions.php",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "accion=clear",
+      }
+    )
+      .then((res) => res.json())
+      .then(() => {
+        cartBody.innerHTML = "";
         checkEmptyCart();
-    }
-}
+        updateCartSummary();
+      })
+      .catch((err) => console.error("Error vaciando carrito:", err));
+  };
 
-// Función para verificar si el carrito está vacío
-function checkEmptyCart() {
-    const cartBody = document.getElementById('cart-body');
-    const emptyMessage = document.getElementById('empty-cart-message');
-
+  // --- Revisar carrito vacío ---
+  function checkEmptyCart() {
+    const emptyMessage = document.getElementById("empty-cart-message");
+    const container = document.getElementById("cart-items-container");
     if (cartBody.children.length === 0) {
-        document.getElementById('cart-items-container').classList.add('d-none');
-        emptyMessage.classList.remove('d-none');
+      container.classList.add("d-none");
+      emptyMessage.classList.remove("d-none");
     } else {
-        document.getElementById('cart-items-container').classList.remove('d-none');
-        emptyMessage.classList.add('d-none');
+      container.classList.remove("d-none");
+      emptyMessage.classList.add("d-none");
     }
-}
+  }
 
-// Función para aplicar cupón
-function applyCoupon() {
-    const couponCode = document.getElementById('coupon-code').value;
-    // Aquí iría la lógica para validar el cupón
-    alert(`Cupón "${couponCode}" aplicado (simulado)`);
+  // --- Aplicar cupón ---
+  window.applyCoupon = function () {
+    const couponCode = document.getElementById("coupon-code").value.trim();
+    if (couponCode) {
+      alert(`Cupón "${couponCode}" aplicado (simulado)`);
+    }
     updateCartSummary();
-}
+  };
 
-// Función para actualizar el resumen del carrito
-function updateCartSummary() {
+  // --- Actualizar resumen ---
+  function updateCartSummary() {
     let subtotal = 0;
-    document.querySelectorAll('.item-total').forEach(td => {
-        subtotal += parseInt(td.textContent.replace(/\D/g, ''));
+    document.querySelectorAll(".item-total").forEach((td) => {
+      let val = td.textContent.replace(/[^0-9]/g, ""); // quitar todo excepto números
+      subtotal += Number(val) || 0;
     });
 
-    const shippingCost = 5000; // Costo fijo de envío por ahora
-    const discount = 0; // Podría calcularse si hay cupones
+    const discount = 0; // si no aplicas cupones
+    const total = subtotal - discount; // sin envío
 
-    document.getElementById('subtotal').textContent = `$${subtotal.toLocaleString()}`;
-    document.getElementById('shipping-cost').textContent = `$${shippingCost.toLocaleString()}`;
-    document.getElementById('discount').textContent = `-$${discount.toLocaleString()}`;
-    document.getElementById('cart-total').textContent = `$${(subtotal + shippingCost - discount).toLocaleString()}`;
+    document.getElementById("subtotal").textContent = formatCurrency(subtotal);
+    document.getElementById("discount").textContent = `-${formatCurrency(
+      discount
+    )}`;
+    document.getElementById("cart-total").textContent = formatCurrency(total);
 
-    // Actualizar contador de productos
-    const itemCount = document.querySelectorAll('#cart-body tr').length;
-    document.getElementById('cart-count').textContent = `${itemCount} ${itemCount === 1 ? 'producto' : 'productos'}`;
-}
+    const itemCount = cartBody.children.length;
+    cartCount.textContent = `${itemCount} ${
+      itemCount === 1 ? "producto" : "productos"
+    }`;
+  }
 
-// Inicializar el carrito
-updateCartSummary();
+  // --- Formatear a CLP ---
+  function formatCurrency(value) {
+    return value.toLocaleString("es-CL", {
+      style: "currency",
+      currency: "CLP",
+    });
+  }
+
+  // --- Inicializar ---
+  loadCart();
+});
