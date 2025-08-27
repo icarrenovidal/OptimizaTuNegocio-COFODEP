@@ -52,7 +52,7 @@ include __DIR__ . '/../../PHP/administracion/navbar.php';
                             <i class="fas fa-shopping-cart fa-3x mb-2"></i>
                             <h4 class="text-prueba">Tu carrito está vacío</h4>
                             <p class="text-muted">Agrega productos para continuar con tu compra</p>
-                            <a href="/tienda" class="btn btn-prueba px-4">
+                            <a href="/Pages/administracion/ver_productos.php" class="btn btn-prueba px-4">
                                 <i class="fas fa-store me-2"></i>Ir a la tienda
                             </a>
                         </div>
@@ -61,7 +61,7 @@ include __DIR__ . '/../../PHP/administracion/navbar.php';
 
                 <div class="card shadow-sm border-0">
                     <div class="card-body p-3 d-flex justify-content-between">
-                        <a href="/tienda" class="btn btn-outline-secondary">
+                        <a href="./../../../OptimizaTuNegocio/Pages/administracion/ver_productos.php" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-2"></i> Seguir comprando
                         </a>
                         <button class="btn btn-clear-cart" onclick="clearCart()">

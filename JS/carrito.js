@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "accion=list",
+        body: "action=list",
       }
     )
       .then((res) => res.json())
@@ -96,7 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
       ? parseInt(input.value)
       : parseInt(input.value) + delta;
     if (isNaN(newQty) || newQty < 1) newQty = 1;
-    if (newQty > 99) newQty = 99;
     input.value = newQty;
 
     fetch(
@@ -104,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `accion=add&id_producto=${id}&cantidad=${newQty}`,
+        body: `action=update&id_producto=${id}&cantidad=${newQty}`, // 🔥 antes era add
       }
     )
       .then((res) => res.json())
@@ -132,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `accion=remove&id_producto=${id}`,
+        body: `action=remove&id_producto=${id}`,
       }
     )
       .then((res) => res.json())
@@ -152,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
       {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "accion=clear",
+        body: "action=clear",
       }
     )
       .then((res) => res.json())

@@ -68,7 +68,9 @@ document.addEventListener("DOMContentLoaded", () => {
                   }" class="btn btn-sm btn-outline-prueba">
                     <i class="fas fa-eye me-1"></i> Detalle
                   </a>
-                  <a href="#" class="btn btn-sm btn-outline-success btn-add-cart" data-id="${prod.id_producto}">
+                  <a href="#" class="btn btn-sm btn-outline-success btn-add-cart" data-id="${
+                    prod.id_producto
+                  }">
                     <i class="fas fa-cart-plus me-1"></i> Agregar 
                   </a>
 
@@ -251,16 +253,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const btn = e.target.closest(".btn-add-cart");
       const id_producto = btn.dataset.id;
 
-      fetch("/OptimizaTuNegocio/OptimizaTuNegocio/Pages/administracion/carrito_actions.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `accion=add&id_producto=${id_producto}&cantidad=1`,
-      })
+      fetch(
+        "/OptimizaTuNegocio/OptimizaTuNegocio/Pages/administracion/carrito_actions.php",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `action=add&id_producto=${id_producto}&cantidad=1`,
+        }
+      )
         .then((res) => res.json())
         .then((data) => {
           if (data.status === "ok") {
+            actualizarContadorCarrito(data.total_carrito);
             alert("Producto agregado al carrito!");
-            // Opcional: actualizar contador visual
           } else {
             alert("Error al agregar producto");
           }
@@ -268,3 +273,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+// --- Función para actualizar contador del navbar ---
+function actualizarContadorCarrito(total) {
+  const contador = document.querySelector(".cart-count");
+  if (!contador) return;
+  contador.textContent = total;
+}

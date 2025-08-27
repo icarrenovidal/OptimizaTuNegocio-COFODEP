@@ -8,71 +8,93 @@ function is_active($page, $current)
 ?>
 <link rel="stylesheet" href="./../../CSS/navbar.css">
 
-<nav class="navbar">
+<nav class="navbar cofodep-navbar">
     <div class="nav-container">
-        <div class="nav-header">
-            <a href="index.php" class="logo">Optimiza<span>TuNegocio</span></a>
+        <div class="nav-main-row">
+            <!-- Logo y emprendimiento -->
+            <div class="nav-brand brand-content">
+                <?php if (!empty($_SESSION['emprendimiento_nombre'])): ?>
+                    <img src="/OptimizaTuNegocio/OptimizaTuNegocio/Uploads/icons/<?= $_SESSION['emprendimiento_logo'] ?? 'icono.png' ?>"
+                        alt="Logo" class="emprendimiento-logo">
+
+                    <span class="emprendimiento-nombre"><?= htmlspecialchars($_SESSION['emprendimiento_nombre']) ?></span>
+                <?php endif; ?>
+            </div>
+
+            <!-- Enlaces de navegación -->
+            <div class="nav-links">
+                <a href="home_cofodep.php" class="<?= is_active('home_cofodep.php', $current_page) ?>">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+                <a href="./../../Pages/cofodep/crear_usuarios.php" class="<?= is_active('crear_usuarios.php', $current_page) ?>">
+                    <i class="fas fa-user-plus"></i> Agregar emprendimiento
+                </a>
+            </div>
+
+            <!-- Acciones de usuario -->
+            <div class="nav-user-actions">
+                <?php if (!empty($_SESSION['usuario_nombre'])): ?>
+                    <div class="user-info">
+                        <span class="usuario-nombre">
+                            <?= htmlspecialchars($_SESSION['usuario_nombre'] . " " . ($_SESSION['usuario_apellido'] ?? '')) ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
+                <a href="/OptimizaTuNegocio/OptimizaTuNegocio/auth/PHP/logout.php" class="logout-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+
+            <!-- Menú hamburguesa -->
             <button class="hamburger" aria-label="Menú" aria-expanded="false">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
         </div>
 
-        <div class="nav-links-container">
-            <div class="nav-links">
-                <a href="home_cofodep.php" class="<?= is_active('index.php', $current_page) ?>">
-                    <i class="fas fa-home"></i> Inicio
-                </a>
-                <a href="/OptimizaTuNegocio/OptimizaTuNegocio/auth/PHP/logout.php" class="logout-link">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
-                </a>
-            </div>
+        <!-- Menú móvil -->
+        <div class="mobile-menu">
+            <a href="home_cofodep.php" class="<?= is_active('home_cofodep.php', $current_page) ?>">
+                <i class="fas fa-home"></i> Inicio
+            </a>
+            <a href="./../../Pages/cofodep/crear_usuarios.php" class="<?= is_active('crear_usuarios.php', $current_page) ?>">
+                <i class="fas fa-user-plus"></i> Agregar emprendimiento
+            </a>
+            <a href="/OptimizaTuNegocio/OptimizaTuNegocio/auth/PHP/logout.php" class="logout-link">
+                <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+            </a>
         </div>
     </div>
 </nav>
 
-
-
-
 <script>
-    // Funcionalidad del menú hamburguesa
     document.addEventListener('DOMContentLoaded', function() {
         const hamburger = document.querySelector('.hamburger');
-        const navContainer = document.querySelector('.nav-links-container');
+        const mobileMenu = document.querySelector('.mobile-menu');
 
         hamburger.addEventListener('click', function() {
             this.classList.toggle('active');
-            navContainer.classList.toggle('active');
-
-            // Actualizar atributo ARIA
+            mobileMenu.classList.toggle('active');
             const isExpanded = this.getAttribute('aria-expanded') === 'true';
             this.setAttribute('aria-expanded', !isExpanded);
         });
 
-        // Cerrar menú al hacer clic en un enlace (en móviles)
-        document.querySelectorAll('.nav-links a').forEach(link => {
+        document.querySelectorAll('.mobile-menu a').forEach(link => {
             link.addEventListener('click', function() {
                 if (window.innerWidth <= 992) {
                     hamburger.classList.remove('active');
-                    navContainer.classList.remove('active');
+                    mobileMenu.classList.remove('active');
                     hamburger.setAttribute('aria-expanded', 'false');
                 }
             });
         });
-    });
-    // Confirmación de logout
-    document.querySelectorAll('.logout-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            if (!confirm('¿Seguro que quieres cerrar sesión?')) {
-                e.preventDefault();
-            }
+
+        // Confirmación de logout
+        document.querySelectorAll('.logout-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (!confirm('¿Seguro que quieres cerrar sesión?')) {
+                    e.preventDefault();
+                }
+            });
         });
-    });
-    window.addEventListener('pageshow', function(event) {
-        if (event.persisted || (window.performance && window.performance.getEntriesByType("navigation")[0].type === "back_forward")) {
-            // Recargar página si viene del cache
-            window.location.reload();
-        }
     });
 </script>

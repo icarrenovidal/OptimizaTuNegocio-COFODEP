@@ -1,16 +1,30 @@
 <?php
+session_start();
 include __DIR__ . '/../../Config/conexion.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
+// ================================
+// Verificar que el usuario tenga un emprendimiento
+// ================================
+if (!isset($_SESSION['id_emprendimiento'])) {
+    echo json_encode([]); // No hay emprendimiento, retorna vacío
+    exit;
+}
+$id_emprendimiento = intval($_SESSION['id_emprendimiento']);
+
+// ================================
 // Recibir filtros desde la URL
+// ================================
 $categoria = $_GET['categoria'] ?? '';
 $precio_min = $_GET['precio_min'] ?? '';
 $precio_max = $_GET['precio_max'] ?? '';
 $nombre = $_GET['nombre'] ?? '';
 $stock = $_GET['stock'] ?? '';
 
-// Consulta base
+// ================================
+// Consulta base con filtro por emprendimiento
+// ================================
 $sql = "
     SELECT 
         p.id_producto,
@@ -31,10 +45,12 @@ $sql = "
         ORDER BY fecha_inicio DESC
     ) pr ON pr.id_producto = p.id_producto
     LEFT JOIN imagenes_productos i ON i.id_producto = p.id_producto
-    WHERE 1
+    WHERE p.id_emprendimiento = $id_emprendimiento
 ";
 
-// Filtros simples
+// ================================
+// Aplicar filtros adicionales
+// ================================
 if($categoria !== '') {
     $sql .= " AND p.id_categoria = " . intval($categoria);
 }
@@ -52,10 +68,10 @@ if($nombre !== '') {
 $sql .= " GROUP BY p.id_producto, i.id_imagen
           ORDER BY p.nombre ASC";
 
-// Filtro de stock usando HAVING (porque stock es SUM)
+// Filtro de stock usando HAVING
 if($stock !== '') {
     if($stock === 'disponible') {
-        $sql .= " HAVING stock > 5"; // Ajusta el límite de "bajo" según tu necesidad
+        $sql .= " HAVING stock > 5";
     } elseif($stock === 'bajo') {
         $sql .= " HAVING stock BETWEEN 1 AND 5";
     } elseif($stock === 'agotado') {
@@ -63,7 +79,9 @@ if($stock !== '') {
     }
 }
 
+// ================================
 // Ejecutar consulta
+// ================================
 $result = $conexion->query($sql);
 $productos = [];
 

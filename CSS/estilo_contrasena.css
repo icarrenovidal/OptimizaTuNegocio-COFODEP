@@ -1,0 +1,26 @@
+.password-feedback {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 8px;
+    font-size: 0.9em;
+}
+
+.password-feedback li.invalid {
+    color: #dc3545; /* rojo */
+}
+
+.password-feedback li.valid {
+    color: #28a745; /* verde */
+}
+.password-feedback p {
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+.password-feedback .valid {
+    color: green;
+}
+
+.password-feedback .invalid {
+    color: red;
+}

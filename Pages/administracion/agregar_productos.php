@@ -1,15 +1,21 @@
 <?php
 session_start();
-include __DIR__ . '/../../PHP/administracion/navbar.php';
 include './../../Config/conexion.php';
+
+// Validar sesión ANTES de cargar la navbar
+if (!isset($_SESSION['id_emprendimiento'])) {
+    header("Location: /OptimizaTuNegocio/OptimizaTuNegocio/auth/pages/login.php");
+    exit;
+}
+
+include __DIR__ . '/../../PHP/administracion/navbar.php';
 
 // Traer todas las categorías
 $sql = "SELECT id_categoria, nombre
 FROM categorias_productos
 ORDER BY 
-    CASE WHEN nombre = 'Otros' THEN 1 ELSE 0 END,  -- 'Otros' al final
-    nombre ASC;                                     -- resto alfabéticamente
-";
+    CASE WHEN nombre = 'Otros' THEN 1 ELSE 0 END,
+    nombre ASC;";
 $result = $conexion->query($sql);
 
 // Guardarlas en un array
@@ -19,6 +25,8 @@ if ($result->num_rows > 0) {
         $categorias[] = $row;
     }
 }
+
+$id_emprendimiento = intval($_SESSION['id_emprendimiento']);
 ?>
 
 
