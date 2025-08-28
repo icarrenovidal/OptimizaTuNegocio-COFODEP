@@ -70,32 +70,63 @@ function obtenerProducto($conexion, $id_producto, $baseUrl)
 
 // 1️⃣ AGREGAR PRODUCTO (sumar cantidades si ya existe)
 if ($action === 'add' && $id_producto) {
-    if (!isset($_SESSION['carrito'][$id_producto])) $_SESSION['carrito'][$id_producto] = 0;
-    $_SESSION['carrito'][$id_producto] += $cantidad; // ✅ ahora suma en vez de pisar
+    $cantidad_solicitada = $cantidad;
 
+    // --- 1. Obtener stock total disponible del producto ---
+    $stmtStock = $conexion->prepare("SELECT SUM(cantidad_actual) as stock_total FROM lotes WHERE id_producto = ?");
+    $stmtStock->bind_param("i", $id_producto);
+    $stmtStock->execute();
+    $resStock = $stmtStock->get_result()->fetch_assoc();
+    $stock_total = (int)$resStock['stock_total'];
+    $stmtStock->close();
+
+    // --- 2. Obtener cantidad que ya tiene el usuario en el carrito ---
+    $cantidad_en_carrito = 0;
     if (isset($_SESSION['id_usuario'])) {
         $id_usuario = $_SESSION['id_usuario'];
+        $stmtC = $conexion->prepare("SELECT cantidad FROM carrito WHERE id_usuario=? AND id_producto=?");
+        $stmtC->bind_param("ii", $id_usuario, $id_producto);
+        $stmtC->execute();
+        $resC = $stmtC->get_result()->fetch_assoc();
+        $cantidad_en_carrito = $resC['cantidad'] ?? 0;
+        $stmtC->close();
+    } elseif (isset($_SESSION['carrito'][$id_producto])) {
+        $cantidad_en_carrito = $_SESSION['carrito'][$id_producto];
+    }
 
+    // --- 3. Validar stock ---
+    if ($cantidad_en_carrito + $cantidad_solicitada > $stock_total) {
+        echo json_encode([
+            'status' => 'error',
+            'msg' => 'No hay suficiente stock disponible.'
+        ]);
+        exit;
+    }
+
+    // --- 4. Agregar al carrito sesión ---
+    if (!isset($_SESSION['carrito'][$id_producto])) $_SESSION['carrito'][$id_producto] = 0;
+    $_SESSION['carrito'][$id_producto] += $cantidad_solicitada;
+
+    // --- 5. Agregar o actualizar en BD ---
+    if (isset($_SESSION['id_usuario'])) {
         $stmt = $conexion->prepare("SELECT cantidad FROM carrito WHERE id_usuario=? AND id_producto=?");
         $stmt->bind_param("ii", $id_usuario, $id_producto);
         $stmt->execute();
         $resultado = $stmt->get_result();
 
         if ($resultado->num_rows > 0) {
-            // ✅ sumamos en BD también
             $row = $resultado->fetch_assoc();
-            $nueva_cant = $row['cantidad'] + $cantidad;
+            $nueva_cant = $row['cantidad'] + $cantidad_solicitada;
             $stmt2 = $conexion->prepare("UPDATE carrito SET cantidad=? WHERE id_usuario=? AND id_producto=?");
             $stmt2->bind_param("iii", $nueva_cant, $id_usuario, $id_producto);
             $stmt2->execute();
             $stmt2->close();
         } else {
             $stmt2 = $conexion->prepare("INSERT INTO carrito(id_usuario, id_producto, cantidad) VALUES(?,?,?)");
-            $stmt2->bind_param("iii", $id_usuario, $id_producto, $cantidad);
+            $stmt2->bind_param("iii", $id_usuario, $id_producto, $cantidad_solicitada);
             $stmt2->execute();
             $stmt2->close();
         }
-
         $stmt->close();
     }
 
@@ -107,7 +138,6 @@ if ($action === 'add' && $id_producto) {
     ]);
     exit;
 }
-
 
 // 2️⃣ LISTAR CARRITO
 if ($action === 'list') {

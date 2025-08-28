@@ -24,61 +24,68 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderCards(productos) {
     viewCards.innerHTML = "";
     productos.forEach((prod) => {
+      const isAgotado = prod.stock <= 0;
+
       const card = `
-        <div class="col">
-          <div class="card h-100 shadow-sm position-relative">
-            <div class="img-container position-relative">
-              <!-- Botón flotante sobre la imagen -->
-              
+      <div class="col">
+        <div class="card h-100 shadow-sm position-relative">
+          <div class="img-container position-relative">
+            <!-- Botón flotante sobre la imagen -->
+            <img src="${
+              prod.imagenes[0] ||
+              "https://via.placeholder.com/300?text=Sin+imagen"
+            }"
+              class="primary-img" alt="${prod.nombre_producto}">
+            <img src="${
+              prod.imagenes[1] ||
+              prod.imagenes[0] ||
+              "https://via.placeholder.com/300?text=Sin+imagen"
+            }"
+              class="hover-img" alt="${
+                prod.nombre_producto
+              } (vista alternativa)">
+          </div>
 
-              <img src="${
-                prod.imagenes[0] ||
-                "https://via.placeholder.com/300?text=Sin+imagen"
-              }"
-                class="primary-img" alt="${prod.nombre_producto}">
-              <img src="${
-                prod.imagenes[1] ||
-                prod.imagenes[0] ||
-                "https://via.placeholder.com/300?text=Sin+imagen"
-              }"
-                class="hover-img" alt="${
-                  prod.nombre_producto
-                } (vista alternativa)">
-            </div>
+          <div class="card-body">
+            <h5 class="card-title mb-1">${prod.nombre_producto}</h5>
+            <span class="price-tag d-block">$${Number(
+              prod.precio
+            ).toLocaleString()}</span>
+            <span class="badge bg-secondary mb-2">${
+              prod.nombre_categoria
+            }</span>
+            <p class="card-text">${prod.descripcion || ""}</p>
+          </div>
 
-            <div class="card-body">
-              <h5 class="card-title mb-1">${prod.nombre_producto}</h5>
-              <span class="price-tag d-block">$${Number(
-                prod.precio
-              ).toLocaleString()}</span>
-              <span class="badge bg-secondary mb-2">${
-                prod.nombre_categoria
-              }</span>
-              <p class="card-text">${prod.descripcion || ""}</p>
-            </div>
-
-            <div class="card-footer bg-white border-top-0 pt-0">
-              <div class="d-flex justify-content-between align-items-center flex-wrap w-100">
-                <small class="text-muted">Disponibles: ${prod.stock} ${
+          <div class="card-footer bg-white border-top-0 pt-0">
+            <div class="d-flex justify-content-between align-items-center flex-wrap w-100">
+              <small class="text-muted">Disponibles: ${prod.stock} ${
         prod.unidad_medida
       }</small>
-                <div class="d-flex gap-2 mt-1 mt-md-0">
-                  <a href="ver_detalle_producto.php?id=${
-                    prod.id_producto
-                  }" class="btn btn-sm btn-outline-prueba">
-                    <i class="fas fa-eye me-1"></i> Detalle
-                  </a>
-                  <a href="#" class="btn btn-sm btn-outline-success btn-add-cart" data-id="${
-                    prod.id_producto
-                  }">
-                    <i class="fas fa-cart-plus me-1"></i> Agregar 
-                  </a>
-
-                </div>
+              <div class="d-flex gap-2 mt-1 mt-md-0">
+                <a href="ver_detalle_producto.php?id=${prod.id_producto}" 
+                   class="btn btn-sm btn-outline-prueba">
+                  <i class="fas fa-eye me-1"></i> Detalle
+                </a>
+                <a href="#" 
+                   class="btn btn-sm btn-${
+                     isAgotado ? "secondary" : "outline-success"
+                   } btn-add-cart" 
+                   data-id="${prod.id_producto}" 
+                   ${
+                     isAgotado
+                       ? "aria-disabled='true' style='pointer-events:none;opacity:0.65;'"
+                       : ""
+                   }>
+                  <i class="fas fa-cart-plus me-1"></i> ${
+                    isAgotado ? "Sin stock" : "Agregar"
+                  }
+                </a>
               </div>
             </div>
           </div>
-        </div>`;
+        </div>
+      </div>`;
       viewCards.insertAdjacentHTML("beforeend", card);
     });
   }
@@ -90,40 +97,48 @@ document.addEventListener("DOMContentLoaded", () => {
       let descripcionCorta = prod.descripcion || "Sin descripción";
       if (descripcionCorta.length > maxChars)
         descripcionCorta = descripcionCorta.substring(0, maxChars) + "...";
+
+      const isAgotado = prod.stock <= 0;
+
       const row = `
-        <tr>
-            <td data-label="Imagen">
-                <img src="${
-                  prod.imagenes[0] ||
-                  "https://via.placeholder.com/50?text=Sin+imagen"
-                }"
-                class="img-table"
-                alt="${prod.nombre_producto}">
-            </td>
-            <td data-label="Producto">${prod.nombre_producto}</td>
-            <td data-label="Categoría">${prod.nombre_categoria}</td>
-            <td data-label="Precio">$${Number(
-              prod.precio
-            ).toLocaleString()}</td>
-            <td data-label="Stock">${prod.stock} ${prod.unidad_medida}</td>
-            <td data-label="Descripción" class="small descripcion" title="${
-              prod.descripcion || ""
-            }">
-                ${descripcionCorta}
-            </td>
-            <td data-label="Acciones" class="actions-cell">
-                <a href="ver_detalle_producto.php?id=${
-                  prod.id_producto
-                }" class="btn btn-sm btn-outline-prueba" title="Ver detalle">
-                    <i class="fas fa-eye"></i>
-                </a>
-                <a href="#" class="btn btn-sm btn-success btn-add-cart" data-id="${
-                  prod.id_producto
-                }" title="Agregar al carrito">
-                    <i class="fas fa-cart-plus"></i>
-                </a>
-            </td>
-        </tr>`;
+      <tr>
+          <td data-label="Imagen">
+              <img src="${
+                prod.imagenes[0] ||
+                "https://via.placeholder.com/50?text=Sin+imagen"
+              }"
+              class="img-table"
+              alt="${prod.nombre_producto}">
+          </td>
+          <td data-label="Producto">${prod.nombre_producto}</td>
+          <td data-label="Categoría">${prod.nombre_categoria}</td>
+          <td data-label="Precio">$${Number(prod.precio).toLocaleString()}</td>
+          <td data-label="Stock">${prod.stock} ${prod.unidad_medida}</td>
+          <td data-label="Descripción" class="small descripcion" title="${
+            prod.descripcion || ""
+          }">
+              ${descripcionCorta}
+          </td>
+          <td data-label="Acciones" class="actions-cell">
+              <a href="ver_detalle_producto.php?id=${prod.id_producto}" 
+                 class="btn btn-sm btn-outline-prueba" title="Ver detalle">
+                  <i class="fas fa-eye"></i>
+              </a>
+              <a href="#" 
+                 class="btn btn-sm btn-${
+                   isAgotado ? "secondary" : "success"
+                 } btn-add-cart" 
+                 data-id="${prod.id_producto}" 
+                 title="${isAgotado ? "Sin stock" : "Agregar al carrito"}"
+                 ${
+                   isAgotado
+                     ? "aria-disabled='true' style='pointer-events:none;opacity:0.65;'"
+                     : ""
+                 }>
+                  <i class="fas fa-${isAgotado ? "ban" : "cart-plus"}"></i>
+              </a>
+          </td>
+      </tr>`;
       rowsBody.insertAdjacentHTML("beforeend", row);
     });
   }

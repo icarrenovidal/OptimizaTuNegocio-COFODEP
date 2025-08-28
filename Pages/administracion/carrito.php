@@ -20,7 +20,7 @@ include __DIR__ . '/../../PHP/administracion/navbar.php';
         <!-- Header Carrito -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="mb-0"><i class="fas fa-shopping-cart me-2 text-prueba"></i>Mi Carrito</h2>
-            <span class="badge badge-cart-count rounded-pill px-3 py-2" id="cart-count">0 productos</span>
+            <span class="badge badge-cart-count rounded-pill px-3 py-2" id="cart-count">0 items</span>
         </div>
 
         <div class="row">
@@ -52,7 +52,7 @@ include __DIR__ . '/../../PHP/administracion/navbar.php';
                             <i class="fas fa-shopping-cart fa-3x mb-2"></i>
                             <h4 class="text-prueba">Tu carrito está vacío</h4>
                             <p class="text-muted">Agrega productos para continuar con tu compra</p>
-                            <a href="/Pages/administracion/ver_productos.php" class="btn btn-prueba px-4">
+                            <a href="./../../../OptimizaTuNegocio/Pages/administracion/ver_productos.php" class="btn btn-prueba px-4">
                                 <i class="fas fa-store me-2"></i>Ir a la tienda
                             </a>
                         </div>
@@ -97,12 +97,14 @@ include __DIR__ . '/../../PHP/administracion/navbar.php';
                         <div class="mb-3">
                             <label for="payment-method" class="form-label text-muted">Método de pago:</label>
                             <select id="payment-method" class="form-select border-prueba">
-                                <option value="card">Tarjeta de crédito/débito</option>
-                                <option value="transfer">Transferencia bancaria</option>
-                                <option value="cash">Efectivo</option>
-                                <option value="pse">PSE</option>
+                                <option value="tarjeta_credito">Tarjeta de crédito</option>
+                                <option value="tarjeta_debito">Tarjeta de débito</option>
+                                <option value="efectivo">Efectivo</option>
+                                <option value="transferencia">Transferencia bancaria</option>
+                                <option value="otro">Otro</option>
                             </select>
                         </div>
+
 
                         <div class="mb-3" id="coupon-section">
                             <label for="coupon-code" class="form-label text-muted">Cupón de descuento:</label>
@@ -129,7 +131,7 @@ include __DIR__ . '/../../PHP/administracion/navbar.php';
     </div>
 
     <script src="./../../JS/carrito.js"></script>
-    
+
 </body>
 
 </html>

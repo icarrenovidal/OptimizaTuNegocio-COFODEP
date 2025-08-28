@@ -35,6 +35,9 @@ function is_active($page, $current)
                 <a href="agregar_productos.php" class="<?= is_active('agregar_productos.php', $current_page) ?>">
                     <i class="fas fa-list"></i> Agregar Productos
                 </a>
+                <a href="ventas.php" class="<?= is_active('ventas.php', $current_page) ?>">
+                    <i class="fas fa-receipt"></i> Ventas
+                </a>
             </div>
 
             <!-- Acciones de usuario -->
@@ -42,19 +45,21 @@ function is_active($page, $current)
                 <?php if (!empty($_SESSION['usuario_nombre'])): ?>
                     <div class="user-info">
                         <span class="usuario-nombre">
-                            <?= htmlspecialchars($_SESSION['usuario_nombre'] . " " . ($_SESSION['usuario_apellido'] ?? '')) ?>
+                            @ <?= htmlspecialchars($_SESSION['usuario_nombre'] . " " . ($_SESSION['usuario_apellido'] ?? '')) ?>
                         </span>
                     </div>
                 <?php endif; ?>
-
-                <a href="/OptimizaTuNegocio/OptimizaTuNegocio/auth/PHP/logout.php" class="logout-link">
-                    <i class="fas fa-sign-out-alt"></i>
-                </a>
 
                 <a href="./../../Pages/administracion/carrito.php" class="cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count">0</span>
                 </a>
+
+                <a href="/OptimizaTuNegocio/OptimizaTuNegocio/auth/PHP/logout.php" class="logout-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+
+
             </div>
 
             <!-- Menú hamburguesa -->

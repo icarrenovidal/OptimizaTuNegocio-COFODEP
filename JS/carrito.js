@@ -218,4 +218,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Inicializar ---
   loadCart();
+  // --- Procesar venta ---
+  const checkoutBtn = document.querySelector(".btn-checkout");
+
+  checkoutBtn.addEventListener("click", () => {
+    const termsCheck = document.getElementById("terms-check");
+    if (!termsCheck.checked) {
+      alert("Debes aceptar los términos y condiciones antes de pagar.");
+      return;
+    }
+
+    const paymentMethod = document.getElementById("payment-method").value;
+
+    if (!confirm("¿Confirmas realizar la compra?")) return;
+
+    checkoutBtn.disabled = true;
+    checkoutBtn.textContent = "Procesando...";
+
+    // --- Recolectar productos del carrito ---
+    const cartItems = Array.from(
+      document.getElementById("cart-body").querySelectorAll("tr")
+    ).map((row) => ({
+      id_producto: row.dataset.id,
+      cantidad: parseInt(row.querySelector(".quantity-input").value),
+    }));
+
+    if (cartItems.length === 0) {
+      alert("El carrito está vacío.");
+      checkoutBtn.disabled = false;
+      checkoutBtn.innerHTML =
+        '<i class="fas fa-credit-card me-2"></i> Proceder al pago';
+      return;
+    }
+
+    // --- Preparar datos para enviar ---
+    const data = new URLSearchParams();
+    data.append("payment_method", paymentMethod);
+    data.append("cart", JSON.stringify(cartItems));
+
+    fetch(
+      "/OptimizaTuNegocio/OptimizaTuNegocio/PHP/administracion/procesar_venta.php",
+      {
+        method: "POST",
+        body: data,
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.status === "ok") {
+          alert("Compra realizada con éxito!");
+          window.location.reload(); // o redirigir a página de éxito
+        } else {
+          alert("Error al procesar la venta: " + data.mensaje);
+        }
+      })
+      .catch((err) => {
+        console.error("Error procesando venta:", err);
+        alert("Error inesperado al procesar la venta.");
+      })
+      .finally(() => {
+        checkoutBtn.disabled = false;
+        checkoutBtn.innerHTML =
+          '<i class="fas fa-credit-card me-2"></i> Proceder al pago';
+      });
+  });
 });

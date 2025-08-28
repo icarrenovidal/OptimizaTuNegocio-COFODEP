@@ -31,21 +31,19 @@ if (!$producto) {
     die("Producto no encontrado.");
 }
 
-// Insertar nuevo lote
-$stmt = $conexion->prepare("
-    INSERT INTO lotes (id_producto, codigo_lote, cantidad_inicial, cantidad_actual, fecha_ingreso, fecha_vencimiento)
-    VALUES (?, ?, ?, ?, ?, ?)
-");
-$stmt->bind_param(
-    "isisss",
-    $id_producto,
-    $codigo_lote,
-    $cantidad,
-    $cantidad,
-    $fecha_ingreso,
-    $fecha_vencimiento
-);
+// Preparar SQL para insertar lote
+$sql_lote = "INSERT INTO lotes (id_producto, codigo_lote, cantidad_inicial, cantidad_actual, fecha_ingreso, fecha_vencimiento)
+             VALUES (?, ?, ?, ?, ?, " . ($fecha_vencimiento ? "?" : "NULL") . ")";
+$stmt = $conexion->prepare($sql_lote);
 
+// Bind de parámetros según si hay fecha de vencimiento
+if ($fecha_vencimiento) {
+    $stmt->bind_param("isisss", $id_producto, $codigo_lote, $cantidad, $cantidad, $fecha_ingreso, $fecha_vencimiento);
+} else {
+    $stmt->bind_param("isiss", $id_producto, $codigo_lote, $cantidad, $cantidad, $fecha_ingreso);
+}
+
+// Ejecutar insert de lote
 if (!$stmt->execute()) {
     die("Error al insertar lote: " . $stmt->error);
 }
@@ -62,16 +60,7 @@ $stmt = $conexion->prepare("
     INSERT INTO movimientos_stock (id_lote, id_producto, tipo, cantidad, fecha, observacion, origen)
     VALUES (?, ?, ?, ?, NOW(), ?, ?)
 ");
-$stmt->bind_param(
-    "iissss",
-    $id_lote,
-    $id_producto,
-    $tipo,
-    $cantidad,
-    $observacion,
-    $origen
-);
-
+$stmt->bind_param("iissss", $id_lote, $id_producto, $tipo, $cantidad, $observacion, $origen);
 
 if (!$stmt->execute()) {
     die("Error al registrar movimiento de stock: " . $stmt->error);
@@ -79,6 +68,6 @@ if (!$stmt->execute()) {
 
 $stmt->close();
 
-// Redirigir a la página de ver productos o agregar stock con mensaje
+// Redirigir con mensaje de éxito
 header("Location: ./../../Pages/administracion/ver_productos.php?mensaje=Stock agregado exitosamente");
 exit;
