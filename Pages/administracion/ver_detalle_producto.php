@@ -1,5 +1,5 @@
 <?php
-session_start();
+include __DIR__ . '/../../Config/auth_check.php';
 include __DIR__ . '/../../PHP/administracion/navbar.php';
 include __DIR__ . '/../../PHP/administracion/obtener_detalle_producto.php';
 ?>

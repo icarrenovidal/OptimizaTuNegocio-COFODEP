@@ -1,5 +1,5 @@
 <?php
-session_start();
+include __DIR__ . '/../../Config/auth_check.php';
 include './../../Config/conexion.php';
 
 // Validar sesión ANTES de cargar la navbar

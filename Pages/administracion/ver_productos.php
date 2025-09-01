@@ -1,5 +1,5 @@
 <?php
-session_start();
+include __DIR__ . '/../../Config/auth_check.php';
 include __DIR__ . '/../../PHP/administracion/navbar.php';
 ?>
 <!DOCTYPE html>
@@ -168,6 +168,10 @@ include __DIR__ . '/../../PHP/administracion/navbar.php';
                 <tbody id="productos-rows-body"></tbody>
             </table>
         </div>
+
+        <!-- Paginación -->
+        <div id="pagination-wrap" class="d-flex justify-content-center my-3"></div>
+
 
     </div>
 

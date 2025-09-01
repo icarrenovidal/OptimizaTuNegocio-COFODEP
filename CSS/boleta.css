@@ -1,0 +1,172 @@
+/* =========================
+   MÓDULO: DETALLE DE VENTA
+   Complementa global.css sin modificarlo
+========================= */
+
+/* Contenedor principal mejorado */
+.tabla-boleta {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    border-top: 4px solid var(--color2);
+}
+
+/* Encabezado con estilo consistente */
+.tabla-boleta h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--color3);
+    color: var(--color1);
+    font-size: 1.8em;
+}
+
+/* Información de la venta */
+.venta-info {
+    background-color: rgba(129, 116, 160, 0.05);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border-left: 4px solid var(--color5);
+}
+
+.venta-info p {
+    margin: 8px 0;
+    color: var(--color1);
+    font-size: 1.05em;
+}
+
+.venta-info strong {
+    color: var(--color2);
+}
+
+/* Tabla con mejoras visuales */
+.tabla-boleta table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 20px;
+}
+
+.tabla-boleta th {
+    background-color: var(--color2);
+    color: white;
+    padding: 14px 12px;
+    text-align: left;
+    font-weight: 600;
+    border: none;
+}
+
+.tabla-boleta td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(129, 116, 160, 0.1);
+    color: var(--color1);
+}
+
+.tabla-boleta tbody tr {
+    transition: background-color 0.2s;
+}
+
+.tabla-boleta tbody tr:hover {
+    background-color: rgba(239, 182, 200, 0.05);
+}
+
+/* Pie de tabla con total */
+.tabla-boleta tfoot {
+    border-top: 2px solid var(--color3);
+}
+
+.tabla-boleta .total {
+    font-weight: bold;
+    text-align: right;
+    color: var(--color1);
+    font-size: 1.1em;
+    padding-right: 15px;
+}
+
+#venta-total {
+    font-weight: bold;
+    color: var(--color4);
+    font-size: 1.2em;
+}
+
+/* Responsive para móviles (mejorado) */
+@media (max-width: 768px) {
+    .tabla-boleta {
+        margin: 20px 15px;
+        padding: 20px 15px;
+    }
+    
+    .tabla-boleta h2 {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+    }
+    
+    .venta-info {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .tabla-boleta table, 
+    .tabla-boleta thead, 
+    .tabla-boleta tbody, 
+    .tabla-boleta th, 
+    .tabla-boleta td, 
+    .tabla-boleta tr {
+        display: block;
+    }
+    
+    .tabla-boleta thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    .tabla-boleta tr {
+        margin-bottom: 1rem;
+        border: 1px solid rgba(129, 116, 160, 0.15);
+        border-radius: 8px;
+        padding: 10px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .tabla-boleta td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+        border-bottom: 1px solid rgba(129, 116, 160, 0.1);
+        padding: 10px 15px 10px 50%;
+    }
+    
+    .tabla-boleta td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: 600;
+        text-align: left;
+        color: var(--color2);
+    }
+    
+    .tabla-boleta tfoot tr {
+        border: none;
+        box-shadow: none;
+        background: transparent;
+    }
+    
+    .tabla-boleta .total {
+        text-align: right;
+        padding-right: 15px;
+        padding-left: 0;
+    }
+    
+    .tabla-boleta .total::before {
+        display: none;
+    }
+}
