@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const bodyVentas = document.getElementById("ventas-body");
   const fechaDesde = document.getElementById("filtro-fecha-desde");
   const fechaHasta = document.getElementById("filtro-fecha-hasta");
+  const canalFiltro = document.getElementById("filtro-canal");
+  const metodoFiltro = document.getElementById("filtro-metodo");
   const btnPrev = document.getElementById("prev-page");
   const btnNext = document.getElementById("next-page");
   const pageInfo = document.getElementById("page-info");
@@ -15,13 +17,15 @@ document.addEventListener("DOMContentLoaded", () => {
   fechaDesde.value = today;
   fechaHasta.value = today;
 
-  function loadVentas(fecha_inicio = "", fecha_fin = "", page = 1) {
+  function loadVentas() {
     bodyVentas.innerHTML = `<tr><td colspan="5" class="text-center">Cargando ventas...</td></tr>`;
 
     const params = new URLSearchParams();
-    if (fecha_inicio) params.append("fecha_inicio", fecha_inicio);
-    if (fecha_fin) params.append("fecha_fin", fecha_fin);
-    params.append("page", page);
+    if (fechaDesde.value) params.append("fecha_inicio", fechaDesde.value);
+    if (fechaHasta.value) params.append("fecha_fin", fechaHasta.value);
+    if (canalFiltro.value) params.append("canal", canalFiltro.value);
+    if (metodoFiltro.value) params.append("metodo_pago", metodoFiltro.value);
+    params.append("page", currentPage);
     params.append("per_page", perPage);
 
     fetch(`./../../PHP/administracion/obtener_ventas.php?${params.toString()}`)
@@ -31,6 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
           bodyVentas.innerHTML = `<tr><td colspan="5" class="text-center">No se encontraron ventas</td></tr>`;
           pageInfo.textContent = "";
           totalPages = 1;
+          btnPrev.disabled = true;
+          btnNext.disabled = true;
           return;
         }
 
@@ -42,19 +48,16 @@ document.addEventListener("DOMContentLoaded", () => {
     <td data-label="Fecha">${v.fecha}</td>
     <td data-label="Total">$${Number(v.total).toLocaleString()}</td>
     <td data-label="Canal">${v.canal_venta}</td>
+    <td data-label="Método de Pago">${v.metodo_pago}</td> <!-- Nueva columna -->
     <td data-label="Acciones">
-        <button class="btn btn-outline-prueba btn-sm btn-detalle" data-id="${
-          v.id_venta
-        }">
+        <button class="btn btn-outline-prueba btn-sm btn-detalle" data-id="${v.id_venta}">
             <i class="fas fa-eye"></i> Ver detalle
         </button>
     </td>
 </tr>`;
-
           bodyVentas.insertAdjacentHTML("beforeend", row);
         });
 
-        // Paginación
         totalPages = Math.ceil(data.total / perPage);
         pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
         btnPrev.disabled = currentPage <= 1;
@@ -66,11 +69,11 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  // Ejecutar automáticamente al cambiar fechas
-  [fechaDesde, fechaHasta].forEach((input) => {
-    input.addEventListener("change", () => {
+  // Ejecutar al cambiar cualquier filtro
+  [fechaDesde, fechaHasta, canalFiltro, metodoFiltro].forEach((el) => {
+    el.addEventListener("change", () => {
       currentPage = 1;
-      loadVentas(fechaDesde.value, fechaHasta.value, currentPage);
+      loadVentas();
     });
   });
 
@@ -78,19 +81,19 @@ document.addEventListener("DOMContentLoaded", () => {
   btnPrev?.addEventListener("click", () => {
     if (currentPage > 1) {
       currentPage--;
-      loadVentas(fechaDesde.value, fechaHasta.value, currentPage);
+      loadVentas();
     }
   });
 
   btnNext?.addEventListener("click", () => {
     if (currentPage < totalPages) {
       currentPage++;
-      loadVentas(fechaDesde.value, fechaHasta.value, currentPage);
+      loadVentas();
     }
   });
 
   // Carga inicial
-  loadVentas(today, today, currentPage);
+  loadVentas();
 
   // Detalle de venta
   document.addEventListener("click", (e) => {

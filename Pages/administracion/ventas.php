@@ -32,7 +32,29 @@ include __DIR__ . '/../../PHP/administracion/navbar.php';
                 <label>Fecha hasta</label>
                 <input type="date" id="filtro-fecha-hasta" class="form-control">
             </div>
+            <div class="form-group">
+                <label>Canal de venta</label>
+                <select id="filtro-canal" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="ferias">Ferias</option>
+                    <option value="redes sociales">Redes Sociales</option>
+                    <option value="tienda física">Tienda Física</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Método de pago</label>
+                <select id="filtro-metodo" class="form-control">
+                    <option value="">Todos</option>
+                    <option value="tarjeta_credito">Tarjeta de crédito</option>
+                    <option value="tarjeta_debito">Tarjeta de débito</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="transferencia">Transferencia</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
         </div>
+
 
         <!-- Tabla de ventas -->
         <div class="table-responsive">
@@ -43,7 +65,8 @@ include __DIR__ . '/../../PHP/administracion/navbar.php';
                         <th>Fecha</th>
                         <th>Total</th>
                         <th>Canal</th>
-                        <th>Acciones</th>
+                        <th>Método de Pago</th>
+                        <th>Acciones</th>                        
                     </tr>
                 </thead>
                 <tbody id="ventas-body">

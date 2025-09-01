@@ -14,8 +14,10 @@ $id_emprendimiento = intval($_SESSION['id_emprendimiento']);
 // Filtros opcionales por URL
 $fecha_inicio = $_GET['fecha_inicio'] ?? '';
 $fecha_fin = $_GET['fecha_fin'] ?? '';
+$canal_venta = $_GET['canal_venta'] ?? '';
+$metodo_pago = $_GET['metodo_pago'] ?? '';
 $page = intval($_GET['page'] ?? 1);
-$per_page = intval($_GET['per_page'] ?? 15);
+$per_page = 12; // Máximo 12 ventas por página
 $offset = ($page - 1) * $per_page;
 
 // Por defecto usar hoy si no se proporcionan fechas
@@ -32,13 +34,25 @@ $sql = "
         v.id_venta,
         v.fecha,
         v.canal_venta,
+        v.metodo_pago,
         SUM(dv.cantidad * dv.precio_unitario) AS total
     FROM ventas v
     LEFT JOIN detalle_venta dv ON dv.id_venta = v.id_venta
     WHERE v.id_emprendimiento = $id_emprendimiento
       AND v.fecha >= '" . $conexion->real_escape_string($fecha_inicio) . "'
       AND v.fecha <= '" . $conexion->real_escape_string($fecha_fin_completa) . "'
-    GROUP BY v.id_venta, v.fecha, v.canal_venta
+";
+
+// Aplicar filtros adicionales
+if($canal_venta !== '') {
+    $sql .= " AND v.canal_venta = '" . $conexion->real_escape_string($canal_venta) . "'";
+}
+if($metodo_pago !== '') {
+    $sql .= " AND v.metodo_pago = '" . $conexion->real_escape_string($metodo_pago) . "'";
+}
+
+$sql .= "
+    GROUP BY v.id_venta, v.fecha, v.canal_venta, v.metodo_pago
     ORDER BY v.fecha DESC
 ";
 
@@ -63,6 +77,7 @@ if ($result) {
             'id_venta' => $row['id_venta'],
             'fecha' => $row['fecha'],
             'canal_venta' => $row['canal_venta'],
+            'metodo_pago' => $row['metodo_pago'],
             'total' => $row['total']
         ];
     }

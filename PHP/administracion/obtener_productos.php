@@ -24,7 +24,7 @@ $stock = $_GET['stock'] ?? '';
 
 // ------------------ PAGINACION ------------------
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : 12;
 $offset = ($page - 1) * $limit;
 
 // ================================
@@ -39,7 +39,6 @@ $sql_total = "
         SELECT id_producto, precio_venta
         FROM precios_productos
         WHERE fecha_fin IS NULL OR fecha_fin >= CURDATE()
-        ORDER BY fecha_inicio DESC
     ) pr ON pr.id_producto = p.id_producto
     WHERE p.id_emprendimiento = $id_emprendimiento
 ";
@@ -65,7 +64,7 @@ $sql = "
         c.nombre AS nombre_categoria,
         COALESCE(SUM(l.cantidad_actual), 0) AS stock,
         COALESCE(pr.precio_venta, 0) AS precio,
-        i.ruta AS imagen
+        GROUP_CONCAT(i.ruta SEPARATOR '|') AS imagenes
     FROM productos p
     LEFT JOIN categorias_productos c ON p.id_categoria = c.id_categoria
     LEFT JOIN lotes l ON l.id_producto = p.id_producto
@@ -73,7 +72,6 @@ $sql = "
         SELECT id_producto, precio_venta
         FROM precios_productos
         WHERE fecha_fin IS NULL OR fecha_fin >= CURDATE()
-        ORDER BY fecha_inicio DESC
     ) pr ON pr.id_producto = p.id_producto
     LEFT JOIN imagenes_productos i ON i.id_producto = p.id_producto
     WHERE p.id_emprendimiento = $id_emprendimiento
@@ -84,18 +82,18 @@ if($precio_min !== '') { $sql .= " AND COALESCE(pr.precio_venta,0) >= " . floatv
 if($precio_max !== '') { $sql .= " AND COALESCE(pr.precio_venta,0) <= " . floatval($precio_max); }
 if($nombre !== '') { $sql .= " AND p.nombre LIKE '%" . $conexion->real_escape_string($nombre) . "%'"; }
 
-$sql .= " GROUP BY p.id_producto, i.id_imagen
+$sql .= " GROUP BY p.id_producto
           ORDER BY p.nombre ASC
           LIMIT $offset, $limit";
 
-// Filtro de stock usando HAVING
+// Filtro de stock usando HAVING (después del GROUP BY)
 if($stock !== '') {
     if($stock === 'disponible') {
-        $sql .= " HAVING stock > 5";
+        $sql = str_replace("LIMIT", "HAVING stock > 5 LIMIT", $sql);
     } elseif($stock === 'bajo') {
-        $sql .= " HAVING stock BETWEEN 1 AND 5";
+        $sql = str_replace("LIMIT", "HAVING stock BETWEEN 1 AND 5 LIMIT", $sql);
     } elseif($stock === 'agotado') {
-        $sql .= " HAVING stock = 0";
+        $sql = str_replace("LIMIT", "HAVING stock = 0 LIMIT", $sql);
     }
 }
 
@@ -107,28 +105,19 @@ $productos = [];
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        $id = $row['id_producto'];
-
-        if (!isset($productos[$id])) {
-            $productos[$id] = [
-                'id_producto' => $id,
-                'nombre_producto' => $row['nombre_producto'],
-                'descripcion' => $row['descripcion'],
-                'unidad_medida' => $row['unidad_medida'],
-                'estado' => $row['estado'],
-                'nombre_categoria' => $row['nombre_categoria'],
-                'stock' => $row['stock'],
-                'precio' => $row['precio'],
-                'imagenes' => []
-            ];
-        }
-
-        if ($row['imagen']) {
-            $productos[$id]['imagenes'][] = './../../' . $row['imagen'];
-        }
+        $imagenes = $row['imagenes'] ? explode('|', $row['imagenes']) : [];
+        $productos[] = [
+            'id_producto' => $row['id_producto'],
+            'nombre_producto' => $row['nombre_producto'],
+            'descripcion' => $row['descripcion'],
+            'unidad_medida' => $row['unidad_medida'],
+            'estado' => $row['estado'],
+            'nombre_categoria' => $row['nombre_categoria'],
+            'stock' => $row['stock'],
+            'precio' => $row['precio'],
+            'imagenes' => array_map(fn($ruta) => './../../' . $ruta, $imagenes)
+        ];
     }
-
-    $productos = array_values($productos);
 }
 
 // ================================
