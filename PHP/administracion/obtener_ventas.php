@@ -43,11 +43,11 @@ $sql = "
       AND v.fecha <= '" . $conexion->real_escape_string($fecha_fin_completa) . "'
 ";
 
-// Aplicar filtros adicionales
-if($canal_venta !== '') {
+// Aplicar filtros opcionales
+if ($canal_venta !== '') {
     $sql .= " AND v.canal_venta = '" . $conexion->real_escape_string($canal_venta) . "'";
 }
-if($metodo_pago !== '') {
+if ($metodo_pago !== '') {
     $sql .= " AND v.metodo_pago = '" . $conexion->real_escape_string($metodo_pago) . "'";
 }
 

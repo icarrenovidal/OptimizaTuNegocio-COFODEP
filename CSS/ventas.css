@@ -1,0 +1,120 @@
+/* =========================
+   MÓDULO: VENTAS
+   Responsive para móviles
+========================= */
+
+/* Ajustes generales para móviles */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+        margin: 10px auto;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+}
+
+/* Filtros responsive */
+@media (max-width: 992px) {
+    .form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+    }
+}
+
+/* Tabla responsive */
+.table-responsive {
+    overflow-x: auto;
+    min-height: 200px;
+}
+
+/* Estilos para la tabla en móviles */
+@media (max-width: 768px) {
+    /* Ocultar algunos encabezados en móviles */
+    table thead th:nth-child(1),
+    table thead th:nth-child(5) {
+        display: none;
+    }
+    
+    table tbody td:nth-child(1),
+    table tbody td:nth-child(5) {
+        display: none;
+    }
+    
+    /* Estilo tipo tarjeta para filas */
+    .table tbody tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px;
+        background: white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .table tbody td {
+        display: block;
+        text-align: right;
+        padding: 8px 10px;
+        position: relative;
+        padding-left: 50%;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .table tbody td:last-child {
+        border-bottom: none;
+    }
+    
+    .table tbody td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: 600;
+        color: #6c757d;
+        text-align: left;
+    }
+    
+    /* Botones de acción apilados */
+    .btn-group .btn {
+        display: block;
+        margin-bottom: 5px;
+        width: 100%;
+    }
+}
+
+/* Paginación responsive */
+@media (max-width: 576px) {
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .page-item {
+        margin-bottom: 5px;
+    }
+}
+
+/* Mejora visual para filtros en móviles */
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+/* Estilo para estado de carga */
+.loading-placeholder {
+    text-align: center;
+    padding: 30px;
+    color: #6c757d;
+}
+
+.loading-placeholder i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #8174A0;
+}
