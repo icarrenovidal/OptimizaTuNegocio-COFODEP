@@ -41,10 +41,18 @@ function obtenerProducto($conexion, $id_producto, $baseUrl)
         LEFT JOIN precios_productos pp 
             ON pp.id_producto = p.id_producto 
             AND (pp.fecha_fin IS NULL OR pp.fecha_fin >= CURDATE())
-        LEFT JOIN imagenes_productos ip 
+        LEFT JOIN (
+            SELECT i1.id_producto, i1.ruta
+            FROM imagenes_productos i1
+            INNER JOIN (
+                SELECT id_producto, MAX(fecha_subida) AS ultima_fecha
+                FROM imagenes_productos
+                GROUP BY id_producto
+            ) i2 
+            ON i1.id_producto = i2.id_producto AND i1.fecha_subida = i2.ultima_fecha
+        ) ip 
             ON ip.id_producto = p.id_producto
         WHERE p.id_producto = ?
-        ORDER BY ip.fecha_subida DESC, pp.fecha_inicio DESC
         LIMIT 1
     ";
     $stmt = $conexion->prepare($sql);
@@ -63,6 +71,7 @@ function obtenerProducto($conexion, $id_producto, $baseUrl)
 
     return $prod ?: null;
 }
+
 
 // ------------------
 // ACCIONES
@@ -145,28 +154,35 @@ if ($action === 'list') {
 
     if (isset($_SESSION['id_usuario'])) {
         $id_usuario = $_SESSION['id_usuario'];
+
         $sql = "
             SELECT 
                 c.id_producto, 
                 c.cantidad, 
                 p.nombre,
-                COALESCE(pp.precio_venta,0) AS precio,
-                ip.ruta AS imagen
+                COALESCE((
+                    SELECT pp.precio_venta
+                    FROM precios_productos pp
+                    WHERE pp.id_producto = p.id_producto
+                      AND (pp.fecha_fin IS NULL OR pp.fecha_fin >= CURDATE())
+                    ORDER BY pp.fecha_inicio DESC
+                    LIMIT 1
+                ), 0) AS precio,
+                (
+                    SELECT ip.ruta
+                    FROM imagenes_productos ip
+                    WHERE ip.id_producto = p.id_producto
+                    ORDER BY ip.fecha_subida DESC
+                    LIMIT 1
+                ) AS imagen
             FROM carrito c
             JOIN productos p ON c.id_producto = p.id_producto
-            LEFT JOIN precios_productos pp
-                ON pp.id_producto = p.id_producto
-                AND (pp.fecha_fin IS NULL OR pp.fecha_fin >= CURDATE())
-            LEFT JOIN imagenes_productos ip
-                ON ip.id_producto = p.id_producto
-            WHERE c.id_usuario=?
-            ORDER BY ip.fecha_subida DESC, pp.fecha_inicio DESC
+            WHERE c.id_usuario = ?
         ";
+
         $stmt = $conexion->prepare($sql);
         if (!$stmt) {
-            echo json_encode([
-                'debug' => ['error_sql' => $conexion->error]
-            ]);
+            echo json_encode(['debug' => ['error_sql' => $conexion->error]]);
             exit;
         }
 
@@ -184,13 +200,10 @@ if ($action === 'list') {
                 'imagen' => $imgPath
             ];
         }
-        $stmt->close();
 
-        if (empty($response)) {
-            echo json_encode([]);
-            exit;
-        }
+        $stmt->close();
     } else {
+        // Usuario no logueado, carrito en sesión
         if (!empty($_SESSION['carrito'])) {
             foreach ($_SESSION['carrito'] as $id => $cant) {
                 $prod = obtenerProducto($conexion, $id, $baseUrl);
@@ -210,6 +223,9 @@ if ($action === 'list') {
     echo json_encode($response);
     exit;
 }
+
+
+
 
 
 // 3️⃣ ELIMINAR PRODUCTO

@@ -27,7 +27,10 @@ function is_active($page, $current)
                     <i class="fas fa-home"></i> Inicio
                 </a>
                 <a href="./../../Pages/cofodep/crear_usuarios.php" class="<?= is_active('crear_usuarios.php', $current_page) ?>">
-                    <i class="fas fa-user-plus"></i> Agregar emprendimiento
+                    <i class="fas fa-user-plus"></i> Agregar Colaborador
+                </a>
+                <a href="./../../Pages/cofodep/dashboard.php" class="<?= is_active('dashboard.php', $current_page) ?>">
+                    <i class="fas fa-receipt"></i> Dashboard
                 </a>
             </div>
 
@@ -57,7 +60,10 @@ function is_active($page, $current)
                 <i class="fas fa-home"></i> Inicio
             </a>
             <a href="./../../Pages/cofodep/crear_usuarios.php" class="<?= is_active('crear_usuarios.php', $current_page) ?>">
-                <i class="fas fa-user-plus"></i> Agregar emprendimiento
+                <i class="fas fa-user-plus"></i> Agregar Colaborador
+            </a>
+            <a href="./../../Pages/cofodep/dashboard.php" class="<?= is_active('dashboard.php', $current_page) ?>">
+                <i class="fas fa-receipt"></i> Dashboard
             </a>
             <a href="/OptimizaTuNegocio/OptimizaTuNegocio/auth/PHP/logout.php" class="logout-link">
                 <i class="fas fa-sign-out-alt"></i> Cerrar sesión

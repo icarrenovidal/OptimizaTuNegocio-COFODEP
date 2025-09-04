@@ -43,10 +43,18 @@ $sql_total = "
     WHERE p.id_emprendimiento = $id_emprendimiento
 ";
 
-if($categoria !== '') { $sql_total .= " AND p.id_categoria = " . intval($categoria); }
-if($precio_min !== '') { $sql_total .= " AND COALESCE(pr.precio_venta,0) >= " . floatval($precio_min); }
-if($precio_max !== '') { $sql_total .= " AND COALESCE(pr.precio_venta,0) <= " . floatval($precio_max); }
-if($nombre !== '') { $sql_total .= " AND p.nombre LIKE '%" . $conexion->real_escape_string($nombre) . "%'"; }
+if ($categoria !== '') {
+    $sql_total .= " AND p.id_categoria = " . intval($categoria);
+}
+if ($precio_min !== '') {
+    $sql_total .= " AND COALESCE(pr.precio_venta,0) >= " . floatval($precio_min);
+}
+if ($precio_max !== '') {
+    $sql_total .= " AND COALESCE(pr.precio_venta,0) <= " . floatval($precio_max);
+}
+if ($nombre !== '') {
+    $sql_total .= " AND p.nombre LIKE '%" . $conexion->real_escape_string($nombre) . "%'";
+}
 
 $total_result = $conexion->query($sql_total);
 $total_productos = ($total_result && $row = $total_result->fetch_assoc()) ? intval($row['total']) : 0;
@@ -63,36 +71,50 @@ $sql = "
         p.estado,
         c.nombre AS nombre_categoria,
         COALESCE(SUM(l.cantidad_actual), 0) AS stock,
-        COALESCE(pr.precio_venta, 0) AS precio,
+        COALESCE(
+            (
+                SELECT pp.precio_venta
+                FROM precios_productos pp
+                WHERE pp.id_producto = p.id_producto
+                  AND (pp.fecha_fin IS NULL OR pp.fecha_fin >= CURDATE())
+                ORDER BY pp.fecha_inicio DESC
+                LIMIT 1
+            ),
+            0
+        ) AS precio,
         GROUP_CONCAT(i.ruta SEPARATOR '|') AS imagenes
     FROM productos p
     LEFT JOIN categorias_productos c ON p.id_categoria = c.id_categoria
     LEFT JOIN lotes l ON l.id_producto = p.id_producto
-    LEFT JOIN (
-        SELECT id_producto, precio_venta
-        FROM precios_productos
-        WHERE fecha_fin IS NULL OR fecha_fin >= CURDATE()
-    ) pr ON pr.id_producto = p.id_producto
     LEFT JOIN imagenes_productos i ON i.id_producto = p.id_producto
     WHERE p.id_emprendimiento = $id_emprendimiento
 ";
 
-if($categoria !== '') { $sql .= " AND p.id_categoria = " . intval($categoria); }
-if($precio_min !== '') { $sql .= " AND COALESCE(pr.precio_venta,0) >= " . floatval($precio_min); }
-if($precio_max !== '') { $sql .= " AND COALESCE(pr.precio_venta,0) <= " . floatval($precio_max); }
-if($nombre !== '') { $sql .= " AND p.nombre LIKE '%" . $conexion->real_escape_string($nombre) . "%'"; }
+
+if ($categoria !== '') {
+    $sql .= " AND p.id_categoria = " . intval($categoria);
+}
+if ($precio_min !== '') {
+    $sql .= " AND COALESCE(pr.precio_venta,0) >= " . floatval($precio_min);
+}
+if ($precio_max !== '') {
+    $sql .= " AND COALESCE(pr.precio_venta,0) <= " . floatval($precio_max);
+}
+if ($nombre !== '') {
+    $sql .= " AND p.nombre LIKE '%" . $conexion->real_escape_string($nombre) . "%'";
+}
 
 $sql .= " GROUP BY p.id_producto
           ORDER BY p.nombre ASC
           LIMIT $offset, $limit";
 
 // Filtro de stock usando HAVING (después del GROUP BY)
-if($stock !== '') {
-    if($stock === 'disponible') {
+if ($stock !== '') {
+    if ($stock === 'disponible') {
         $sql = str_replace("LIMIT", "HAVING stock > 5 LIMIT", $sql);
-    } elseif($stock === 'bajo') {
+    } elseif ($stock === 'bajo') {
         $sql = str_replace("LIMIT", "HAVING stock BETWEEN 1 AND 5 LIMIT", $sql);
-    } elseif($stock === 'agotado') {
+    } elseif ($stock === 'agotado') {
         $sql = str_replace("LIMIT", "HAVING stock = 0 LIMIT", $sql);
     }
 }
