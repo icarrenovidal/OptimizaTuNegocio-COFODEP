@@ -41,6 +41,9 @@ function is_active($page, $current)
                 <a href="dashboard.php" class="<?= is_active('dashboard.php', $current_page) ?>">
                     <i class="fas fa-receipt"></i> Dashboard
                 </a>
+                <a href="movimientos_stock.php" class="<?= is_active('movimientos_stock.php', $current_page) ?>">
+                    <i class="fas fa-receipt"></i> Movimientos de Stock
+                </a>
             </div>
 
             <!-- Acciones de usuario -->
@@ -84,6 +87,12 @@ function is_active($page, $current)
             </a>
             <a href="ventas.php" class="<?= is_active('ventas.php', $current_page) ?>">
                 <i class="fas fa-list"></i> Ventas
+            </a>
+            <a href="dashboard.php" class="<?= is_active('dashboard.php', $current_page) ?>">
+                <i class="fas fa-list"></i> Dashboard
+            </a>
+            <a href="movimientos_stock.php" class="<?= is_active('movimientos_stock.php', $current_page) ?>">
+                <i class="fas fa-list"></i> Movimientos de Stock
             </a>
             <a href="/OptimizaTuNegocio/OptimizaTuNegocio/auth/PHP/logout.php" class="logout-link">
                 <i class="fas fa-sign-out-alt"></i> Cerrar sesión

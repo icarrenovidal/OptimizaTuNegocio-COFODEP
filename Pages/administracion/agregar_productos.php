@@ -78,8 +78,6 @@ $id_emprendimiento = intval($_SESSION['id_emprendimiento']);
                                     <?php endforeach; ?>
                                 </select>
 
-
-
                             </div>
                         </div>
 
